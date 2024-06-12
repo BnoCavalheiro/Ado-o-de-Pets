@@ -6,7 +6,8 @@ import cookieParser from 'cookie-parser';
 const host = '0.0.0.0';
 const porta = 3000;
 
-let listaProdutos = [];
+let listaInteressado = [];
+let listaPet = [];
 
 
 const app = express();
@@ -33,130 +34,147 @@ function usuarioEstaAutenticado(requisicao, resposta, next){
     }
 }
 
-function cadastrarProduto(requisicao, resposta){
-    const codigo_barras = requisicao.body.codigo_barras;
-    const descricao = requisicao.body.descricao;
-    const preco_custo = requisicao.body.preco_custo;
-    const preco_venda = requisicao.body.preco_venda;
-    const data_validade = requisicao.body.data_validade;
-    const qtd_estoque = requisicao.body.qtd_estoque;
-    const fabricante = requisicao.body.fabricante;
+function cadastrarInteressado(requisicao, resposta){
+    const nome = requisicao.body.nome;
+    const email = requisicao.body.email;
+    const telefone = requisicao.body.telefone;
 
 
-    if (codigo_barras && descricao && preco_custo && preco_venda && data_validade && qtd_estoque && fabricante) 
+    if (nome && email && telefone) 
     {
-        listaProdutos.push({
-            codigo_barras: codigo_barras,
-            descricao: descricao,
-            preco_custo: preco_custo,
-            preco_venda: preco_venda,
-            data_validade: data_validade,
-            qtd_estoque: qtd_estoque,
-            fabricante: fabricante
+        listaInteressado.push({
+            nome: nome,
+            email: email,
+            telefone: telefone,
         });
-        resposta.redirect('/listarProdutos');
+        resposta.redirect('/listarInteressado');
     }
     else
     {
         resposta.write(`
-        <!DOCTYPE html>
-<html lang="en">
-
+ <!DOCTYPE html>
+<html lang="pt-br">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Página de cadastro de produtos</title>
-    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.0.2/dist/css/bootstrap.min.css" rel="stylesheet"
-        integrity="sha384-EVSTQN3/azprG1Anm3QDgpJLIm9Nao0Yz1ztcQTwFspd3yD65VohhpuuCOmLASjC" crossorigin="anonymous">
+    <title>Cadastro de Interessado</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.0.2/dist/css/bootstrap.min.css" rel="stylesheet">
 </head>
-
 <body>
     <div class="container m-5">
-        <form method="POST" action='/cadastrarProduto' class="border row g-3 needs-validation" novalidate>
-            <legend>Cadastro de Produtos</legend>
-            <div class="col-md-4">
-                <label for="codigo_barras" class="form-label">Código de Barras:</label>
-                <input type="text" class="form-control" id="codigo_barras" name="codigo_barras" value="${codigo_barras}" required>`);
-        if (codigo_barras == ""){
+        <h2>Cadastro de Interessado</h2>
+        <form method="POST" action='/cadastrarInteressado' class="border p-3 needs-validation" novalidate>
+            <div class="mb-3">
+                <label for="nome" class="form-label">Nome:</label>
+                <input type="text" class="form-control" id="nome" name="nome" value"${nome}" required>`);
+        if (nome == ""){
             resposta.write(`
                         <div m-2 class="alert alert-danger" role="alert">
-                            Por favor, informe o Código de Barras.
+                            Por favor, informe o nome.
                         </div>
             `);
         }
         resposta.write(`</div>
-        <div class="col-md-4">
-            <label for="descricao" class="form-label">Descrição do Produto:</label>
-            <input type="text" class="form-control" id="descricao" name="descricao" value="${descricao}" required>`);
-        if (descricao == ""){
+            <div class="mb-3">
+                <label for="email" class="form-label">Email:</label>
+                <input type="email" class="form-control" id="email" name="email" value"${email}" required>`);
+        if (email == ""){
             resposta.write(`<div m-2 class="alert alert-danger" role="alert">
-                                Por favor, informe a descrição do Produto.
+                                Por favor, informe o email.
                             </div>`);
         }        
         resposta.write(`
-        </div>
-        <div class="col-md-4">
-            <label for="preco_custo" class="form-label">Preço de Custo:</label>
-            <input type="number" step="0.01" class="form-control" id="preco_custo" name="preco_custo" value"${preco_custo}" required>
+   </div>
+            <div class="mb-3">
+                <label for="telefone" class="form-label">Telefone:</label>
+                <input type="tel" class="form-control" id="telefone" name="telefone" value"${telefone}" required>
         `);            
-        if (preco_custo == ""){
+        if (telefone == ""){
             resposta.write(`<div class="alert alert-danger" role="alert">
-                                Por favor, informe o preço de custo do produto.
+                                Por favor, informe o telefone.
                             </div>`);
-        }
-        resposta.write(`  </div>
-        <div class="col-md-4">
-            <label for="preco_venda" class="form-label">Preço de Venda:</label>
-            <input type="number" step="0.01" class="form-control" id="preco_venda" name="preco_venda" value"${preco_venda}" required>`
-        );
-        if (preco_venda == ""){
-            resposta.write(`<div class="alert alert-danger" role="alert">
-                                Por favor, informe o preço de venda do produto.
-                            </div>`);
-        }
-        resposta.write(`</div>
-        <div class="col-md-4">
-            <label for="data_validade" class="form-label">Data de Validade:</label>
-            <input type="date" class="form-control" id="data_validade" name="data_validade" value"${data_validade}" required>`
-        );
-        if (data_validade == ""){
-            resposta.write(`<div class="alert alert-danger" role="alert">
-                                Por favor, informe a data de validade do produto.
-                            </div>`);
-        }
-        resposta.write(`</div>
-        <div class="col-md-4">
-            <label for="qtd_estoque" class="form-label">Quantidade em Estoque:</label>
-            <input type="number" class="form-control" id="qtd_estoque" name="qtd_estoque" value "${qtd_estoque}"required>
-            `);
-        if (qtd_estoque == ""){
-            resposta.write(`<div class="alert alert-danger" role="alert">
-                                Por favor, informe a quantidade em estoque.
-                            </div>`);
-        }
-
-        resposta.write(`</div>
-        <div class="col-md-4">
-            <label for="fabricante" class="form-label">Nome do Fabricante:</label>
-            <input type="text" class="form-control" id="fabricante" name="fabricante" value"${fabricante}" required>`);
-        if (fabricante == ""){
-            resposta.write(`<div class="alert alert-danger" role="alert">
-                                Por favor, informe o fabricante do produto.
-                            </div>`);
-        }
+        }       
         resposta.write(` </div>
-        <div class="col-12 mb-3">
-            <button class="btn btn-primary" type="submit">Cadastrar Produto</button>
-            <a class="btn btn-secondary" href="/">Voltar</a>                   
-        </div>
-    </form>
-</div>
+            <button class="btn btn-primary" type="submit">Cadastrar Interessado</button>
+            <a class="btn btn-secondary" href="/">Voltar</a>
+        </form>
+    </div>
 </body>
-<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.0.2/dist/js/bootstrap.bundle.min.js"
-integrity="sha384-MrcW6ZMFYlzcLA8Nl+NtUVF0sA7MsXsP1UyJoMp4YLEuNSfAP+JcXn/tWtIaxVXM"
-crossorigin="anonymous"></script>
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.0.2/dist/js/bootstrap.bundle.min.js"></script>
+</html>
+`);
+        resposta.end();
+    }
+}
 
-</html>`);
+function cadastrarPet(requisicao, resposta){
+    const nome = requisicao.body.nome;
+    const raca = requisicao.body.raca;
+    const idade = requisicao.body.idade;
+
+
+    if (nome && raca && idade) 
+    {
+        listaPet.push({
+            nome: nome,
+            raca: raca,
+            idade: idade,
+        });
+        resposta.redirect('/listarPet');
+    }
+    else
+    {
+        resposta.write(`
+ <!DOCTYPE html>
+<html lang="pt-br">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Cadastro de Pet</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.0.2/dist/css/bootstrap.min.css" rel="stylesheet">
+</head><body>
+    <div class="container m-5">
+        <h2>Cadastro de Pet</h2>
+        <form method="POST" action='/cadastrarPet' class="border p-3 needs-validation" novalidate>
+            <div class="mb-3">
+                <label for="nome" class="form-label">Nome:</label>
+                <input type="text" class="form-control" id="nome" name="nome" value="${nome}" required>`);
+        if (nome == ""){
+            resposta.write(`
+                        <div m-2 class="alert alert-danger" role="alert">
+                            Por favor, informe o nome do Pet.
+                        </div>
+            `);
+        }
+        resposta.write(`</div>
+            <div class="mb-3">
+                <label for="raca" class="form-label">Raça:</label>
+                <input type="text" class="form-control" id="raca" name="raca" value="${raca}" required>`);
+        if (raca == ""){
+            resposta.write(`<div m-2 class="alert alert-danger" role="alert">
+                                Por favor, informe a raça.
+                            </div>`);
+        }        
+        resposta.write(`
+       </div>
+            <div class="mb-3">
+                <label for="idade" class="form-label">Idade (em anos):</label>
+                <input type="number" class="form-control" id="idade" name="idade" value="${idade}" required>
+        `);            
+        if (idade == ""){
+            resposta.write(`<div class="alert alert-danger" role="alert">
+                                Por favor, informe a idade.
+                            </div>`);
+        }       
+        resposta.write(` </div>
+            <button class="btn btn-primary" type="submit">Cadastrar Pet</button>
+            <a class="btn btn-secondary" href="/">Voltar</a>
+        </form>
+    </div>
+</body>
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.0.2/dist/js/bootstrap.bundle.min.js"></script>
+</html>
+`);
         resposta.end();
     }
 
@@ -207,9 +225,11 @@ app.use(express.static(path.join(process.cwd(), 'publico')));
 
 app.use(usuarioEstaAutenticado,express.static(path.join(process.cwd(), 'protegido')));
 
-app.post('/cadastrarProduto', usuarioEstaAutenticado, cadastrarProduto);
+app.post('/cadastrarInteressado', usuarioEstaAutenticado, cadastrarInteressado);
 
-app.get('/listarProdutos', usuarioEstaAutenticado, (req,resp)=>{
+app.post('/cadastrarPet', usuarioEstaAutenticado, cadastrarPet);
+
+app.get('/listarInteressado', usuarioEstaAutenticado, (req,resp)=>{
     resp.write('<html>');
     resp.write('<head>');
     resp.write('<title>Resultado do cadastro</title>');
@@ -217,26 +237,55 @@ app.get('/listarProdutos', usuarioEstaAutenticado, (req,resp)=>{
     resp.write('<link href="https://cdn.jsdelivr.net/npm/bootstrap@5.0.2/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-EVSTQN3/azprG1Anm3QDgpJLIm9Nao0Yz1ztcQTwFspd3yD65VohhpuuCOmLASjC" crossorigin="anonymous">')
     resp.write('</head>');
     resp.write('<body>');
-    resp.write('<h1>Lista de Produtos</h1>');
+    resp.write('<h1>Lista de Interessados</h1>');
     resp.write('<table class="table table-striped">');
     resp.write('<tr>');
-    resp.write('<th>Código de Barras</th>');
-    resp.write('<th>Descrição do Produto</th>');
-    resp.write('<th>Preço de Custo</th>');
-    resp.write('<th>Preço de Venda</th>');
-    resp.write('<th>Data de Validade</th>');
-    resp.write('<th>Quantidade em Estoque</th>');
-    resp.write('<th>Nome do Fabricante</th>');
+    resp.write('<th>Nome</th>');
+    resp.write('<th>Email</th>');
+    resp.write('<th>Telefone</th>');
     resp.write('</tr>');
-    for (let i=0; i<listaProdutos.length; i++){
+    for (let i=0; i<listaInteressado.length; i++){
         resp.write('<tr>');
-        resp.write(`<td>${listaProdutos[i].codigo_barras}`);
-        resp.write(`<td>${listaProdutos[i].descricao}`);
-        resp.write(`<td>${listaProdutos[i].preco_custo}`);
-        resp.write(`<td>${listaProdutos[i].preco_venda}`);
-        resp.write(`<td>${listaProdutos[i].data_validade}`);
-        resp.write(`<td>${listaProdutos[i].qtd_estoque}`);
-        resp.write(`<td>${listaProdutos[i].fabricante}`);
+        resp.write(`<td>${listaInteressado[i].nome}`);
+        resp.write(`<td>${listaInteressado[i].email}`);
+        resp.write(`<td>${listaInteressado[i].telefone}`);
+        resp.write('</tr>');
+    }
+    resp.write('</table>');
+    resp.write('<a href="/">Voltar</a>');
+    resp.write('<br/>');
+
+    if(req.cookies.dataUltimoAcesso){
+        resp.write('<p>');
+        resp.write('Seu último acesso foi em ' + req.cookies.dataUltimoAcesso);
+        resp.write('</p>');
+    }
+    resp.write('</body>');
+    resp.write('<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.0.2/dist/js/bootstrap.bundle.min.js" integrity="sha384-MrcW6ZMFYlzcLA8Nl+NtUVF0sA7MsXsP1UyJoMp4YLEuNSfAP+JcXn/tWtIaxVXM" crossorigin="anonymous"></script>')
+    resp.write('</html>');
+    resp.end();
+});
+
+app.get('/listarPet', usuarioEstaAutenticado, (req,resp)=>{
+    resp.write('<html>');
+    resp.write('<head>');
+    resp.write('<title>Resultado do cadastro</title>');
+    resp.write('<meta charset="utf-8">');
+    resp.write('<link href="https://cdn.jsdelivr.net/npm/bootstrap@5.0.2/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-EVSTQN3/azprG1Anm3QDgpJLIm9Nao0Yz1ztcQTwFspd3yD65VohhpuuCOmLASjC" crossorigin="anonymous">')
+    resp.write('</head>');
+    resp.write('<body>');
+    resp.write('<h1>Lista de Pets</h1>');
+    resp.write('<table class="table table-striped">');
+    resp.write('<tr>');
+    resp.write('<th>Nome</th>');
+    resp.write('<th>Raça</th>');
+    resp.write('<th>Idade</th>');
+    resp.write('</tr>');
+    for (let i=0; i<listaPet.length; i++){
+        resp.write('<tr>');
+        resp.write(`<td>${listaPet[i].nome}`);
+        resp.write(`<td>${listaPet[i].raca}`);
+        resp.write(`<td>${listaPet[i].idade}`);
         resp.write('</tr>');
     }
     resp.write('</table>');
