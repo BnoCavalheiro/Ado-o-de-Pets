@@ -12,30 +12,15 @@
         <form method="POST" action='/adotarPet' class="border p-3 needs-validation" novalidate>
             <div class="mb-3">
                 <label for="interessado" class="form-label">Interessado:</label>
-                <select class="form-select" id="interessado" name="interessado" required>
-                </select>
+                <input class="form-select" id="interessado" name="interessado" required>
             </div>
             <div class="mb-3">
                 <label for="pet" class="form-label">Pet:</label>
-                <select class="form-select" id="pet" name="pet" required>
-                </select>
+                <input class="form-select" id="pet" name="pet" required>
             </div>
             <button class="btn btn-primary" type="submit">Registrar Adoção</button>
             <a class="btn btn-secondary" href="/">Voltar</a>
         </form>
-        <br/>
-        <h3>Lista de Adoções</h3>
-        <table class="table">
-            <thead>
-                <tr>
-                    <th>Interessado</th>
-                    <th>Pet</th>
-                    <th>Data</th>
-                </tr>
-            </thead>
-            <tbody>
-            </tbody>
-        </table>
     </div>
 </body>
 <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.0.2/dist/js/bootstrap.bundle.min.js"></script>

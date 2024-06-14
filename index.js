@@ -8,6 +8,7 @@ const porta = 3000;
 
 let listaInteressado = [];
 let listaPet = [];
+let listaAdotar = [];
 
 
 const app = express();
@@ -179,6 +180,72 @@ function cadastrarPet(requisicao, resposta){
     }
 
 }
+
+function adotarPet(requisicao, resposta){
+    const interessado = requisicao.body.interessado;
+    const pet = requisicao.body.pet;
+
+    if (interessado && pet) 
+    {
+        listaAdotar.push({
+            interessado: interessado,
+            pet: pet,
+        });
+        resposta.redirect('/listarAdotar');
+    }
+    else
+    {
+        resposta.write(`
+ <!DOCTYPE html>
+<html lang="pt-br">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Adotar um Pet</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.0.2/dist/css/bootstrap.min.css" rel="stylesheet">
+</head>
+<body>
+    <div class="container m-5">
+        <h2>Adotar um Pet</h2>
+        <form method="POST" action='/adotarPet' class="border p-3 needs-validation" novalidate>
+            <div class="mb-3">
+                <label for="interessado" class="form-label">Interessado:</label>
+                <input class="form-select" id="interessado" name="interessado" value"${interessado}" required>`);
+
+        if (interessado == ""){
+            resposta.write(`
+                        <div m-2 class="alert alert-danger" role="alert">
+                            Por favor, informe o interessado para adoção.
+                        </div>
+            `);
+        }
+        resposta.write(`
+            </div>
+            <div class="mb-3">
+                <label for="pet" class="form-label">Pet:</label>
+                <input class="form-select" id="pet" name="pet" value"${pet}" required>`);
+
+        if (pet == ""){
+            resposta.write(`<div m-2 class="alert alert-danger" role="alert">
+                                Por favor, informe o PET para ser adotado.
+                            </div>`);
+        }        
+
+        resposta.write(`
+            </div>
+            <button class="btn btn-primary" type="submit">Registrar Adoção</button>
+            <a class="btn btn-secondary" href="/">Voltar</a>
+        </form>
+    </div>
+</body>
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.0.2/dist/js/bootstrap.bundle.min.js"></script>
+</html>
+`);
+
+    resposta.end();
+    }
+}
+
 function autenticaUsuario(requisicao, resposta){
     const usuario = requisicao.body.usuario;
     const senha = requisicao.body.senha;
@@ -228,6 +295,8 @@ app.use(usuarioEstaAutenticado,express.static(path.join(process.cwd(), 'protegid
 app.post('/cadastrarInteressado', usuarioEstaAutenticado, cadastrarInteressado);
 
 app.post('/cadastrarPet', usuarioEstaAutenticado, cadastrarPet);
+
+app.post('/adotarPet', usuarioEstaAutenticado, adotarPet);
 
 app.get('/listarInteressado', usuarioEstaAutenticado, (req,resp)=>{
     resp.write('<html>');
@@ -286,6 +355,41 @@ app.get('/listarPet', usuarioEstaAutenticado, (req,resp)=>{
         resp.write(`<td>${listaPet[i].nome}`);
         resp.write(`<td>${listaPet[i].raca}`);
         resp.write(`<td>${listaPet[i].idade}`);
+        resp.write('</tr>');
+    }
+    resp.write('</table>');
+    resp.write('<a href="/">Voltar</a>');
+    resp.write('<br/>');
+
+    if(req.cookies.dataUltimoAcesso){
+        resp.write('<p>');
+        resp.write('Seu último acesso foi em ' + req.cookies.dataUltimoAcesso);
+        resp.write('</p>');
+    }
+    resp.write('</body>');
+    resp.write('<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.0.2/dist/js/bootstrap.bundle.min.js" integrity="sha384-MrcW6ZMFYlzcLA8Nl+NtUVF0sA7MsXsP1UyJoMp4YLEuNSfAP+JcXn/tWtIaxVXM" crossorigin="anonymous"></script>')
+    resp.write('</html>');
+    resp.end();
+});
+
+app.get('/listarAdotar', usuarioEstaAutenticado, (req,resp)=>{
+    resp.write('<html>');
+    resp.write('<head>');
+    resp.write('<title>Resultado do cadastro</title>');
+    resp.write('<meta charset="utf-8">');
+    resp.write('<link href="https://cdn.jsdelivr.net/npm/bootstrap@5.0.2/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-EVSTQN3/azprG1Anm3QDgpJLIm9Nao0Yz1ztcQTwFspd3yD65VohhpuuCOmLASjC" crossorigin="anonymous">')
+    resp.write('</head>');
+    resp.write('<body>');
+    resp.write('<h1>Lista de Adoção</h1>');
+    resp.write('<table class="table table-striped">');
+    resp.write('<tr>');
+    resp.write('<th>Interessado</th>');
+    resp.write('<th>Pet</th>');
+    resp.write('</tr>');
+    for (let i=0; i<listaAdotar.length; i++){
+        resp.write('<tr>');
+        resp.write(`<td>${listaAdotar[i].interessado}`);
+        resp.write(`<td>${listaAdotar[i].pet}`);
         resp.write('</tr>');
     }
     resp.write('</table>');
