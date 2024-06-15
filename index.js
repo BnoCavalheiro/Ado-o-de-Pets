@@ -249,7 +249,7 @@ function adotarPet(requisicao, resposta){
 function autenticaUsuario(requisicao, resposta){
     const usuario = requisicao.body.usuario;
     const senha = requisicao.body.senha;
-    if (usuario == 'admin' && senha == '123'){
+    if (usuario == 'admin' && senha == '1234'){
         requisicao.session.usuarioAutenticado = true;
         resposta.cookie('dataUltimoAcesso', new Date().toLocaleString(),{
             httpOnly: true,
